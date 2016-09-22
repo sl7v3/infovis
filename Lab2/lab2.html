@@ -212,15 +212,34 @@ document.write("<P>Q8 test, color: "+ Math.round(calculate_color(-0.5))+ "</p>")
 var canvas = document.getElementById("canvas");  
 var context = canvas.getContext("2d"); 
 context.font = "8pt Arial"; // we want 8pt Arial for our text
-
-var xStartLoc=0;  // where on the canvas we will start drawing on the x-axis
+var xStartLoc=100;  // where on the canvas we will start drawing on the x-axis
 var spaceBetweenBar=5; // padding between the bars
 var yStartLoc=100; // where we will start drawing the bar on the y-axis
 var width=10; // how wide we should make the bar
 var xLoc=width+spaceBetweenBar; // the width plus the buffer
+function drawAxis(){
+  //draw the x and y axis
+  context.beginPath();
+  context.moveTo(90,0);
+  context.lineTo(90,105);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(90,105);
+  context.lineTo(190,105);
+  context.stroke();
+  context.fillText('Salary($)',20,60);  // draw the text
+  context.fillText('Name',120,140);  // draw the text
+}
 
+// show the salary values as they relate to bars
+function showSalaryValues(data) { //loop through salary values and display them at the appropriate heights
+  for (salaryVal = maxSalary(data); salaryVal>= minSalary(data); salaryVal--) {
+    context.fillText(salaryVal,80,110 - height(salaryVal));  // draw the text
+ }
+}
 // draw all the bars
 function drawBars(data) {
+     drawAxis();
      var idx = -1;  // idx will be where we are in the list
      for (idx in data) {
           var val = data[idx].salary;  // find the salary of the person
@@ -229,8 +248,9 @@ function drawBars(data) {
           context.fillStyle = "rgb(0,0,"+ color+ ")";  // calculate the fill color
           context.fillRect (xStartLoc+idx*xLoc, yStartLoc, width, -height(val)); // draw the bar
           context.fillStyle = "rgb(40,40,40)";  // set the text color
-          context.fillText(heading,idx*15+2,100+10);  // draw the text
+          context.fillText(heading,idx*15+102,120);  // draw the text
      }
+     showSalaryValues(data);
 }
 
 // run the drawBars command on the salaryData
