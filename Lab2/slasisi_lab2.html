@@ -1,0 +1,241 @@
+<html>
+<HEAD>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<STYLE>
+h1 { font-family: 'Open Sans', sans-serif; font-weight: 400; }
+h2 { font-family: 'Open Sans', sans-serif; font-weight: 200; }
+p { font-family: 'Open Sans', sans-serif; font-weight: 400; }
+li { font-family: 'Open Sans', sans-serif; font-weight: 400; }
+</STYLE>
+</HEAD>
+<body>
+
+<h1>SI649/EECS548, Lab 2 - Fall 2016</h1>
+<p>Your Name: Sulaimon Lasisi</p>
+<p>Your Partner: Danielle Livneh</p>
+
+<P>Question 9: Given the initial question: "How much does each employee make and are they being over or under paid?" this visualization isn't <B>expressive</B> because: [it is not possible to tell how much an employee makes from the visualization. The values of the bar graphs are not given and there is no label that tells what the bar graph represents.]</P>
+<P>Question 9: This visualization isn't <B>effective</B> because it is hard to tell the values of the salaries. Including a label for salary values would make it easier to tell.]</P>
+
+<canvas id="canvas" width="400" height="200"></canvas>
+<P></P>
+
+<script type="text/javascript">
+
+
+var salaryData = 
+[{name:"A",salary:4,dept:"IT"},
+{name:"B",salary:2,dept:"HR"},
+{name:"C",salary:3,dept:"HR"},
+{name:"D",salary:1,dept:"MG"},
+{name:"E",salary:5,dept:"IT"},
+{name:"F",salary:5,dept:"SL"}
+];
+
+/////////////////////////////////////////////////////////////////////////////
+//Question 1: What's the salary and department of E?(uncomment and try the following command)
+//alert("Name = E, salary ="+salaryData[4].salary+" dept ="+ salaryData[4].dept)
+//console.log("Name = E, salary ="+salaryData[4].salary+" dept ="+ salaryData[4].dept) 
+//confirm("Name = E, salary ="+salaryData[4].salary+" dept ="+ salaryData[4].dept)
+
+/////////////////////////////////////////////////////////////////////////////
+//Question 2: Write a for loop that outputs name + salary and colors by department
+// write your code here
+// hint: document.write("<font color=’red’>"+...+"</font>");
+
+COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+
+for(i = 0; i < salaryData.length; i++) {
+  document.write("<font color="+COLORS[i]+">"+salaryData[i].name+" "+salaryData[i].salary+"</font>");
+  document.write("<br>");
+}
+
+//Question 3: What's the mean salary of all employees? 
+// should return XXXXX  
+function meanSalary(data){
+  sum = 0;
+  for(i = 0; i < salaryData.length; i++){
+    sum += salaryData[i].salary
+  }
+  return sum/salaryData.length;
+}
+document.write("<P>Q3 answer:"+meanSalary(salaryData)+"</P>")  
+
+/////////////////////////////////////////////////////////////////////////////
+//Question 4: What's the mean salary of each department?
+var meansByDept={"HR":0, "IT":0, "MG":0, "SL":0}
+
+// should calculate the mean salary for every department
+// data: the entire table (e.g., salaryData)
+// dept: string representing the department (e.g., "HR")
+function dept_mean_salary(data, dept){
+  sum = 0;
+  count = 0;
+  for(i=0; i < data.length; i++){
+    if(data[i].dept == dept) {
+      sum += data[i].salary;
+      count++;
+    }
+  }
+  return sum/count;
+}
+
+document.write("<P>Q4 test (should be 4.5): "+dept_mean_salary(salaryData,'IT')+"</P>")
+
+// loop over all the departments and replace the
+// 0's in meansByDept with the actual mean
+// data: the salary data 
+function populatemeans(data){
+  for (i in meansByDept){
+    meansByDept[i] = dept_mean_salary(data, i);
+  }
+}
+populatemeans(salaryData);
+
+document.write("<P>Q4 test (should be 4.5): "+meansByDept['IT']+"</P>");
+console.log(meansByDept);
+
+/////////////////////////////////////////////////////////////////////////////
+//Question 5: find out if a specific employee is under- or over- paid, and by how much. 
+
+// loops through the salary table and modifies it so that each employee
+// has a record called overunder saying how much they are over or underpaid
+// relative to their department average. If you're at average this will be 0
+// if you're above below (e.g., person A, this should be negative)
+function addOverUnderPayInfo(data){
+  for(i = 0; i < data.length; i++){
+    data[i].overunder = (data[i].salary - meansByDept[data[i].dept])
+  }
+  return data
+}
+addOverUnderPayInfo(salaryData)
+
+document.write("<P>Q5 test (should be -.5): "+salaryData[0].overunder+"</P>")
+
+/////////////////////////////////////////////////////////////////////////////
+//Question 6: What is the minimum and maximum salary of all employees? 
+function maxSalary(data){
+    var max=Number.NEGATIVE_INFINITY 
+    for(i=0; i < data.length; i++){
+      if(data[i].salary > max) {
+        max = data[i].salary;
+      }
+    }       
+    return max 
+}
+function minSalary(data){
+// Your work here 
+    var min=Number.POSITIVE_INFINITY
+    for(i=0; i < data.length; i++){
+      if(data[i].salary < min) {
+        min = data[i].salary;
+      }
+    }       
+    return min 
+}
+var inputSalaryRange={"min":minSalary(salaryData), "max":maxSalary(salaryData)}
+
+document.write("<P>Q6 test, min to max: "+inputSalaryRange['min'] + " to " + inputSalaryRange['max'] + "</p>")
+
+console.log(inputSalaryRange)
+
+/////////////////////////////////////////////////////////////////////////////
+//Question 7: What is the height of the bar? 
+heightRange={"min":10, "max":100}
+
+// the bar heights will be (fill in the rest by hand)
+// A: 77.5
+// B: 32.5
+// C: 55
+// D: 10
+// E: 100
+// F: 100
+
+// generate a function that does this automatically, it should take a salary (1-5) as input
+// and produce a pixel height based on above
+function height(salary){
+    return heightRange.min + ((salary - inputSalaryRange['min'] ) / (inputSalaryRange['max'] - inputSalaryRange['min'])) * (heightRange['max'] - heightRange['min']);
+}
+
+document.write("<P>Q7 test (should be 100): "+height(5) + "</p>")
+
+// you should make sure your code still works if we modify the height range.  For example, if we make
+// heightRange={"min":20,"max":200}
+// height(1) should be 20
+// and height(5) should be 200
+
+/////////////////////////////////////////////////////////////////////////////
+//Question 8 How to find employees who are underpaid and overpaid by adding color encoding? 
+
+// calculate the maximum value we can be overpaid, you should be able to use your min/max code
+// from question 6
+function maxOverunder(data){
+    var max=Number.NEGATIVE_INFINITY
+    for(i = 0; i < data.length; i++) {
+      if(data[i].overunder > max) {
+        max = data[i].overunder;
+      }
+    }
+    return max 
+}
+
+// calculate the minimum value we can be overpaid, you should be able to use your min/max code
+// from question 6
+function minOverunder(data){
+    var min=Number.POSITIVE_INFINITY
+     for(i = 0; i < data.length; i++) {
+      if(data[i].overunder < min) {
+        min = data[i].overunder;
+      }
+    }
+    return min 
+}
+
+overunderRange={"min":minOverunder(salaryData), "max":maxOverunder(salaryData)};
+colorRange={"min":0, "max":255};
+
+document.write("<P>Q8 test, min to max: "+overunderRange['min'] + " to " + overunderRange['max'] + "</p>")
+
+// calculate color encoding based on how much over or under paid a person is
+// the input should range from min to max overunder
+// the colors should range from 0 to 255 (this will set the "blue" rgb value if you do it correctly)
+function calculate_color(overUnder){
+  return Math.round((overUnder - overunderRange['min'] ) / (overunderRange['max'] - overunderRange['min'])) * (colorRange['max'] - colorRange['min']);
+}
+
+document.write("<P>Q8 test, color: "+ Math.round(calculate_color(-0.5))+ "</p>")
+
+
+// If you've done everything correctly up until now you should see the bars show up in your HTML
+
+// get the canvas
+var canvas = document.getElementById("canvas");  
+var context = canvas.getContext("2d"); 
+context.font = "8pt Arial"; // we want 8pt Arial for our text
+
+var xStartLoc=0;  // where on the canvas we will start drawing on the x-axis
+var spaceBetweenBar=5; // padding between the bars
+var yStartLoc=100; // where we will start drawing the bar on the y-axis
+var width=10; // how wide we should make the bar
+var xLoc=width+spaceBetweenBar; // the width plus the buffer
+
+// draw all the bars
+function drawBars(data) {
+     var idx = -1;  // idx will be where we are in the list
+     for (idx in data) {
+          var val = data[idx].salary;  // find the salary of the person
+          var heading = data[idx].name; // find the person's name
+          var color=calculate_color(data[idx].overunder) // calculate the blue based on over/under
+          context.fillStyle = "rgb(0,0,"+ color+ ")";  // calculate the fill color
+          context.fillRect (xStartLoc+idx*xLoc, yStartLoc, width, -height(val)); // draw the bar
+          context.fillStyle = "rgb(40,40,40)";  // set the text color
+          context.fillText(heading,idx*15+2,100+10);  // draw the text
+     }
+}
+
+// run the drawBars command on the salaryData
+drawBars(salaryData)
+
+</script>
+</body>
+</html>
