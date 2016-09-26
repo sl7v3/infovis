@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EnglandCSVCleaner.cpp">
+    <ClCompile Include="EnglandCsvSeed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
