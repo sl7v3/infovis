@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  date: 
+  season: 1
+  home: MyString
+  visitor: MyString
+  ft: MyString
+  hgoal: 1
+  vgoal: 1
+  tier: 1
+  totgoal: 1
+  goaldif: 1
+  result: MyString
+
+two:
+  date: 
+  season: 1
+  home: MyString
+  visitor: MyString
+  ft: MyString
+  hgoal: 1
+  vgoal: 1
+  tier: 1
+  totgoal: 1
+  goaldif: 1
+  result: MyString
