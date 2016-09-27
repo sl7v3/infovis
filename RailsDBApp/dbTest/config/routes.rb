@@ -53,4 +53,8 @@ Rails.application.routes.draw do
   #     # (app/controllers/admin/products_controller.rb)
   #     resources :products
   #   end
+  root 'games#index'
+  get 'games/data' => 'games#data', :defaults => { :format => 'json' }
+
+
 end
