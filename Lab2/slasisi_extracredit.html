@@ -200,10 +200,12 @@ document.write("<P>Q8 test, min to max: "+overunderRange['min'] + " to " + overu
 // the input should range from min to max overunder
 // the colors should range from 0 to 255 (this will set the "blue" rgb value if you do it correctly)
 function calculate_color(overUnder){
-  return Math.round((overUnder - overunderRange['min'] ) / (overunderRange['max'] - overunderRange['min'])) * (colorRange['max'] - colorRange['min']);
+  return Math.round((overUnder - overunderRange['min'] ) / (overunderRange['max'] - overunderRange['min']) * (colorRange['max'] - colorRange['min']));
+}
+for (idx in salaryData){
+  document.write("<P>Q8 test, color for: " + salaryData[idx].name + " " + (calculate_color(salaryData[idx].overunder))+ "</p>")
 }
 
-document.write("<P>Q8 test, color: "+ Math.round(calculate_color(-0.5))+ "</p>")
 
 
 // If you've done everything correctly up until now you should see the bars show up in your HTML
