@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Empty page template</title>
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+		// make the svg
+		 var svg = d3.select("body").append("svg")
+		 				.attr("width",1000).attr("height",500);
+		 
+		 // dataset
+		 dataset = [ {"a":10,"b":20}, //m1
+					 {"a":15,"b":25}, //m2
+					 {"a":15,"b":5}]; //m3
+		 
+		 // create a grouping operator, one for each
+		 var groups = svg.selectAll("g")// grab all g’s (we have none)
+						 .data(dataset) // loop over dataset
+						 .enter() // this will make us as many "g's" as we have data
+						 .append("g");
+
+		 // CREATE THE RED SQUARE
+		 // into every group, we're going to first draw
+		 // a square for the "a" dimension. Notice that we don't
+		 // have to "enter" anymore. There are 3 pieces of data
+		 // and we previously created 3 g's.
+		 groups
+				 .append("rect")
+				 //.data(dataset) // we don't actually need this line
+				 .attr("x",20) // always in the same column, but move the y:
+				 .attr("y", function(d,i) {return ((i*100) + 50); })
+				 .attr("width",function (d) {return d['a'];})
+				 .attr("height",function (d) {return d['a'];})
+				 .attr("fill","red");
+
+		 // CREATE THE BLUE SQUARE
+		 groups
+				 .append("rect")
+				 //.data(dataset) // we don't actually need this line
+				 .attr("x", 100) // always in the same column, but move the y:
+				 .attr("y", function(d,i) {return ((i*100) + 50); })
+				 .attr("width",function (d) {return d['b'];})
+				 .attr("height",function (d) {return d['b'];})
+				 .attr("fill","blue");
+		</script>
+	</body>
+</html>

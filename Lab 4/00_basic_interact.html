@@ -1,0 +1,42 @@
+<!DOCTYPE html> 
+<html>
+	<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"> 
+<title>My project</title>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js">
+</script>
+</head>
+	<body>
+<div id="chart"></div>
+<script>
+svg = d3.select("#chart") // make the svg
+		.append("svg")
+		.attr({width:300,height:300});
+
+rect = svg.append("rect") // make rectangle
+		.attr({x:50,y:50,width:50,height:50})
+
+atOrigin = true; // Boolean telling us where the rectangle is
+
+// when the form is clicked, execute this
+function clickRect() {
+	if (atOrigin) {  // if we’re at the origin (50,50)
+		rect.transition().attr("x",100).attr("y",100)
+			.ease("bounce");
+		atOrigin = false;  // we are now somewhere else
+	} else {
+		// we’re somewhere else, move us back to origin
+		rect.transition().attr("x",50).attr("y",50)
+			.ease("bounce");
+		atOrigin = true; // reset the indicator
+	}
+}
+
+
+</script>
+	<FORM>
+	<INPUT TYPE=BUTTON value="click me" onclick="clickRect();">
+	</FORM>
+
+	</body> 
+</html>
