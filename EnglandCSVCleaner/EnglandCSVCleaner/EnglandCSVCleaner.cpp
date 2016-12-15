@@ -11,17 +11,19 @@ int main()
 	char next_symbol;
 	ofstream outFile;
 	ifstream inFile;
-	inFile.open("C:\\Users\\Aitor\\Google Drive\\UMich\\Fall 2016\\EECS 548 - Information Visualization\\Lab 1\\england.csv");
+	char* input_file = "Enter input file here";
+	char* output_file = "Enter output file here";
+	inFile.open(input_file);
 	if (inFile.fail())
 	{
-		cerr << "Could not open the input file C:\\Users\\Aitor\\Google Drive\\UMich\\Fall 2016\\EECS 548 - Information Visualization\\Lab 1\\england.csv";
+		cerr << "Could not open the input file " << input_file << endl;
 		exit(1);
 	}
-	outFile.open("C:\\Users\\Aitor\\Google Drive\\UMich\\Fall 2016\\EECS 548 - Information Visualization\\Lab 1\\formattedEngland.csv");
+	outFile.open(output_file);
 	if (outFile.fail())
 	{
-		cerr << "Could not open the output file C:\\Users\\Aitor\\Google Drive\\UMich\\Fall 2016\\EECS 548 - Information Visualization\\Lab 1\\formattedEngland.csv";
-		exit(2);
+		cerr << "Could not open the output file " << output_file << endl;
+		exit(1);
 	}
 	inFile.get(next_symbol);
 	while (!inFile.eof())

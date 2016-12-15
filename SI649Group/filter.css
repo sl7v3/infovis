@@ -1,0 +1,37 @@
+#dropdown {
+	display: inline-block;
+	width: 250px;
+}
+
+ul {
+  list-style: none;
+}
+
+.main_ul {
+	padding-left: 0px;
+}
+
+#big_container {
+	float: right;
+}
+
+#options_form {
+	float: right;
+	padding-right: 10%;
+}
+
+body {
+	background: rgba(54, 25, 25, .05);
+}
+
+h1 {
+	text-align: center;
+	padding-bottom: 80px;
+}
+
+.char {
+	margin-left: 70px;
+	display: inline-block;
+	margin-bottom: 20px;
+}
+

@@ -1,0 +1,74 @@
+[ 
+  {
+    "name": "Men (all)",
+    "data": [162641, 164158, 165713, 173666, 183560, 187161, 186955, 185365, 183112, 184806],
+    "marker": { "symbol":"triangle" },
+    "color": "#C397CC"
+  },
+  {
+    "name": "Men - White",
+    "data": [132140, 132433, 132823, 138362, 145342, 147268, 146034, 144028, 141419, 141662],
+    "marker": { "symbol":"triangle" },
+    "color": "#A4BBD5"
+  },
+  {
+    "name": "Men - Hispanic",
+    "data": [6917, 7176, 7375, 7763, 8360, 8709, 9031, 9249, 9317, 9672],
+    "marker": { "symbol":"triangle" },
+    "color": "#FFCA72"
+  },
+  {
+    "name": "Men - African",
+    "data": [8096, 8470, 8798, 9475, 10393,  10961,  11316,  11578,  11701,  12132],
+    "marker": { "symbol":"triangle" },
+    "color": "#A8EE5C"
+  },
+  {
+    "name": "Men - Native",
+    "data": [1365, 1382, 1396, 1437, 1462, 1463, 1410, 1362, 1341, 1296],
+    "marker": { "symbol":"triangle" },
+    "color": "#F386B3"
+  },
+  {
+    "name": "Men - Minority",                      
+    "data": [16378, 17028, 17569,  18675,  20215,  21133,  21757,  22189,  22359,  23100],
+    "marker": { "symbol":"triangle" },
+    "color": "#E3D73F"
+  },
+  {
+    "name": "Women (all)",
+    "data": [56560,  58539,  60806,  65019,  70097,  72660,  73474,  74018,  74017,  74884],
+    "marker": { "symbol":"circle" },
+    "color": "#A408C4"
+  },
+  {
+    "name": "Women - White",
+    "data": [41174,  42293,  43671,  46400,  49742,  51181,  51355,  51348,  51064,  51212],
+    "marker": { "symbol":"circle" },
+    "color": "#388CE8"
+  },
+  {
+    "name": "Women - Hispanic",
+    "data": [2663, 2810, 2961, 3195, 3503, 3692, 3806, 3941, 4021, 4147],
+    "marker": { "symbol":"circle" },
+    "color": "#F6A623"
+  },
+  {
+    "name": "Women - African",
+    "data": [6704, 7046, 7348, 7897, 8505, 8943, 9193, 9434, 9468, 9666],
+    "marker": { "symbol":"circle" },
+    "color": "#7ED321"
+  },
+  {
+    "name": "Women - Native",
+    "data": [585, 583, 614, 661, 687, 685, 691, 669, 667, 667],
+    "marker": { "symbol":"circle" },
+    "color": "#ED2A7B"
+  },
+  {
+    "name": "Women - Minority",
+    "data": [9367, 9856, 10309,  11092,  12008,  12635,  12999,  13375,  13489,  13813],
+    "marker": { "symbol":"circle" },
+    "color": "#B3A606"
+  }
+]

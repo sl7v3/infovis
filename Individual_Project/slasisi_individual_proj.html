@@ -1,0 +1,493 @@
+<html>
+<HEAD>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<STYLE>
+h1 { font-family: 'Open Sans', sans-serif; font-weight: 400; }
+h2 { font-family: 'Open Sans', sans-serif; font-weight: 200; }
+h3 { font-family: 'Open Sans', sans-serif; font-weight: 200; }
+p { font-family: 'Open Sans', sans-serif; font-weight: 400; }
+td { font-family: 'Open Sans', sans-serif; font-weight: normal; }
+th { font-family: 'Open Sans', sans-serif; font-weight: bold; }
+li { font-family: 'Open Sans', sans-serif; font-weight: 400; }
+</STYLE>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+</HEAD>
+
+<body>
+
+<h2>Sulaimon Lasisi Individual Project - Parallel Computing Explorable Explanation</h2>
+<p>Parallel computing is a type of computation in which many calculations or the execution of processes are carried out simultaneously. Large problems can often be divided into smaller ones, which can then be solved at the same time. - Wikipedia. This visualization applies parallel computing to addition computations. It shows the number of iterations and the partial/total sums at any given time during the computation.<br>
+<b>How to explore parallel computing using this visualization:</b><br>
+Task: Addition of all numbers between 1 and 40.<br>
+Resources: There are four different processors available: single-core, dual-core, quad-core and eight-core processors.<br>
+Procedure: The "Add Once" button at the lower-right section of the page performs addition during each iteration. Only one addition is allowed per core per iteration. Processors continue adding numbers between 1 and 40 every time the add button is pressed, unless the processor has completed the addition task. When the addition task is complete, processor stops adding and consolidates its sum on one core for the user to see. The consolidation of all partial sums on one core takes one iteration.<br>
+Exploration Tips: Click the "Add Once" button to perform an addition across all processors. As you continue to click this button, the partial sum added on each core increases as seen in the colored bars. You can hover over either the red bars or colored bars to find out more information about the core/processor. When a processor completes its task, all cores send their values to the root core (core 1) by emptying their colored bars and filling up the root core's color bar. To simulate what happens on real parallel processors, when the sum is computed, the "Add Once" button is disabled so that all the partial sums on different cores are sent to the root core. After the root core saves the total sum, the "Add Once" button is enabled again. This behavior is to model the gathering of data that happens at the end of computation in parallel processors.
+Enjoy Adding in Parallel!
+</p>
+
+<script type="text/javascript">
+function fillArrayWithNumbers(n) {
+        var arr = Array.apply(null, Array(n));
+        return arr.map(function (x, i) { return i+1 });
+}
+var sum_arr = fillArrayWithNumbers(40);
+var sum = sum_arr.reduce((a, b) => a + b, 0);
+//settings for chart 
+var maxBarPerRow = 8;
+var svgWidth=120
+var svgHeight=150 
+var xStartLoc=0 //the left offset from canvas to the first bar 
+var spaceBetweenBar=3
+var yStartLoc=105 // the top offset from canvas to the bottom of the bar. 
+var width=20 //width of bar 
+var xLoc=width+spaceBetweenBar 
+var heightRange={"min":0, "max":100}
+var sumRange={"min":0, "max":sum}
+var colorRange={"min":0, "max":255};
+var single_core_array = [0];
+var dual_core_array = [0,0];
+var quad_core_array = [0,0,0,0];
+var eight_core_array = [0,0,0,0,0,0,0,0];
+var max_val_array = [sum];
+var single_core = 1;
+var dual_core = 2;
+var quad_core = 4;
+var eight_core = 8;
+var init_array = [single_core_array, dual_core_array,quad_core_array,eight_core_array];
+var iteration = 0;
+var duration=1200;
+
+</script>
+
+<script>
+var heightRescale = d3.scale.linear()
+  .domain([heightRange.min, heightRange.max])
+  .range([sumRange.min, sumRange.max])
+
+var heightScale = d3.scale.linear()
+  .domain([sumRange.min, sumRange.max])
+  .range([heightRange.min, heightRange.max]); 
+
+console.log (heightScale(0))
+var colorScale= d3.scale.linear()
+  .domain([sumRange.min,sumRange.max])  // MODIFY HERE
+  .range([colorRange.min,colorRange.max]);  // MODIFY HERE
+var svg;
+var barChartD3;
+
+function createCharts(n, arr) {
+  svg = d3.select('body')
+      .append('svg')
+      .attr('class', 'svg'+n) 
+        .attr('width', ((svgWidth*n)+svgWidth))
+        .attr('height', svgHeight)
+        .append('g')
+        .attr('class', 'd3Chart'+n)
+  svg.append("text")
+                .attr("class","core")
+                .text(function(d,i){
+                  var core_type;
+                     if (n == 1){ core_type = "Single-"}
+                     else if (n == 2){ core_type = "Dual-"}
+                     else if (n == 4){ core_type = "Quad-"}
+                     else core_type = "Eight-"
+                    return core_type+"core"
+                })
+                 .attr("x",function(d,i){
+                        return (svgWidth/2)
+                      })
+                  .attr('y',15) 
+                  .attr("font-family","Open Sans")
+                 .attr("font-size","12pt");
+      var bars = svg.selectAll("g")
+                          .data(arr)
+                          .enter()
+                          .append("g")
+                          .attr('class',  function(d,i){return"barChartD3"+n+(i+1)});
+    bars.append('rect')    
+            .attr('class', 'maxBar')
+            .attr('x',function(d,i){ 
+              return (xStartLoc+(40+svgWidth*i)+i*(width+spaceBetweenBar ))}) 
+            .attr('y',function(d,i){ return (0)})  
+            .attr('height',function(d,i){return heightScale(sum)})
+            .attr('width',width)
+            .attr("fill", "red");
+    bars.append('rect')    
+            .attr('class', 'bar')
+            .attr('x',function(d,i){ 
+              return (xStartLoc+(40+svgWidth*i)+i*(width+spaceBetweenBar ))})  
+            .attr('y',function(d,i){ return (heightRange.max - heightScale(d))})  
+            .attr('height',function(d,i){return heightScale(d)})
+            .attr('width',width)
+            .attr("fill", function(d,i){
+               if (n == 1){
+                return "yellow";
+               }
+               else if (n == 2){
+                return "blue";
+               }
+               else if (n == 4){
+                return "green";
+               }
+               else return "purple";
+              });
+    bars.append("text")
+                 .attr("class","label")
+                 .text(function(d){
+                     return d
+                 })
+                 .attr("x",function(d,i){
+                     return xStartLoc+(30+svgWidth*i)+i*(width+spaceBetweenBar )+width/2
+                 })
+                 .attr("y",function(d){
+                     return (95)
+                 })
+                 .attr("font-family","Arial")
+                 .attr("font-size","8pt")
+    bars.append("text")
+                .attr("class","title")
+                .text(function(d,i){
+                     return (i+1)+ " of " + n
+                 })
+                 .attr("x",function(d,i){
+                        return xStartLoc+(15+svgWidth*i)+i*(width+spaceBetweenBar )+width/2
+                      })
+                  .attr('y',120) 
+                  .attr("font-family","Open Sans")
+                 .attr("font-size","8pt"); 
+    bars.append("text")
+                .attr("class","range_min")
+                .text(function(d,i){
+                     return 0
+                 })
+                 .attr("x",function(d,i){
+                        return (xStartLoc+(20+svgWidth*i)+i*(width+spaceBetweenBar ))})
+                  .attr('y',heightRange.max) 
+                  .attr("font-family","Open Sans")
+                 .attr("font-size","8pt"); 
+    bars.append("text")
+                .attr("class","range_max")
+                .text(function(d,i){
+                     return 820
+                 })
+                 .attr("x",function(d,i){
+                        return (xStartLoc+(10+svgWidth*i)+i*(width+spaceBetweenBar ))})
+                  .attr('y',10) 
+                  .attr("font-family","Open Sans")
+                 .attr("font-size","8pt"); 
+    bars.append("text")
+                .attr("class","y-axis label")
+                .text(function(d,i){
+                     return "Sum"
+                 })
+                 .attr("x",function(d,i){
+                        return (xStartLoc+(5+svgWidth*i)+i*(width+spaceBetweenBar ))})
+                  .attr('y',50) 
+                  .attr("font-family","Open Sans")
+                 .attr("font-size","8pt"); 
+    bars.append("text")
+                .attr("class","x-axis label")
+                .text(function(d,i){
+                     return "Core #"
+                 })
+                 .attr("x",function(d,i){
+                        return xStartLoc+(45+svgWidth*i)+i*(width+spaceBetweenBar )+width/2})
+                  .attr('y',110) 
+                  .attr("font-family","Open Sans")
+                 .attr("font-size","8pt"); 
+    bars.append("line")          // attach a line
+    .style("stroke", "black")  // colour the line
+    .attr("x1", function(d,i){ 
+              return (xStartLoc+(30+svgWidth*i)+i*(width+spaceBetweenBar ))})   // x position of the first end of the line
+    .attr("y1", heightRange.min)      // y position of the first end of the line
+    .attr("x2", function(d,i){ return (xStartLoc+(30+svgWidth*i)+i*(width+spaceBetweenBar ))})    // x position of the second end of the line
+    .attr("y2", heightRange.max);
+    bars.append("line")          // attach a line
+    .style("stroke", "black") // colour the line    
+    .attr("x1", function(d,i){ return (xStartLoc+(30+svgWidth*i)+i*(width+spaceBetweenBar ))})    // x position of the second end of the line
+    .attr("y1", heightRange.max)
+    .attr("x2", function(d,i){ 
+              return ((xStartLoc+(30+svgWidth*i)+i*(width+spaceBetweenBar )) +((width+spaceBetweenBar)*2) )})   // x position of the first end of the line
+    .attr("y2", heightRange.max)      // y position of the first end of the line
+     
+}
+createCharts(single_core, single_core_array);
+createCharts(dual_core, dual_core_array);
+createCharts(quad_core, quad_core_array);
+createCharts(eight_core, eight_core_array);
+
+function add_single_core(i, arr, core_arr){
+  //i means iteration
+  //add while i is less than the total number of items in array for single core
+  if ((i) < arr.length){
+    core_arr[0]+=arr[i];
+  }
+
+}
+
+function add_dual_core(i, arr, core_arr){
+  //i means iteration
+  //add while i*num_cores is less than total number of items in array
+  if (((i)*dual_core) < arr.length){
+    counter = ((i)*dual_core);
+    core_arr[0]+=arr[counter];
+    core_arr[1]+=arr[counter+1];
+  }
+
+}
+
+function add_quad_core(i, arr, core_arr){
+  //i means iteration
+  //add while i*num_cores is less than total number of items in array
+  if (((i)*quad_core) < arr.length){
+      counter = ((i)*quad_core);
+      core_arr[0]+=arr[counter];
+      core_arr[1]+=arr[counter+1];
+      core_arr[2]+=arr[counter+2];
+      core_arr[3]+=arr[counter+3];
+  }
+}
+
+function add_eight_core(i, arr, core_arr){
+  //add while i*num_cores is less than total number of items in array
+  //i means iteration
+  
+  if (((i)*eight_core) < arr.length){
+      counter = ((i)*eight_core);
+      core_arr[0]+=arr[counter];
+      core_arr[1]+=arr[counter+1];
+      core_arr[2]+=arr[counter+2];
+      core_arr[3]+=arr[counter+3];
+      core_arr[4]+=arr[counter+4];
+      core_arr[5]+=arr[counter+5];
+      core_arr[6]+=arr[counter+6];
+      core_arr[7]+=arr[counter+7];
+    
+
+  }
+
+}
+function updateChart(arr, num){
+  for (k = 0; k < num; k++){
+    d3.select('.barChartD3'+num+(k+1)).select('.bar')
+                    .transition()
+                   .duration(duration) 
+                   .attr('y',function(){ 
+                    return (heightRange.max - heightScale(arr[k]))})  // modify this line
+                   .attr('height',function(){return heightScale(arr[k])})  
+    d3.select('.barChartD3'+num+(k+1)).select('text.'+'label')
+                    .transition()
+                   .duration(duration) 
+                   .text(function(){
+                     return arr[k]
+                 })
+  }
+}
+
+function visualizeCompletion(arr, num){
+  d3.select(".btn").attr('disabled', true);
+  var current_partial_sum = arr[0];
+  if (num>1){
+    for (k = 1; k < num; k++){
+      d3.select('.barChartD3'+num+(k+1)).select('.bar')
+                      .transition()
+                      .duration(duration*k) 
+                     .attr('y',function(d,i){ return (heightRange.max)})  // modify this line
+                     .attr('height',function(d,i){return 0})
+      current_partial_sum += arr[k];
+      d3.select('.barChartD3'+num+(0+1)).select('.bar')
+                      .transition()
+                      .duration(duration*num) 
+                     .attr('y',function(d,i){ return (heightRange.max - heightScale(current_partial_sum))})  // modify this line
+                     .attr('height',function(d,i){return heightScale(current_partial_sum)})
+      d3.select('.barChartD3'+num+(k+1)).select('text.'+'label')
+                      .transition()
+                     .duration(duration) 
+                     .text(function(){
+                       return 0
+                   })
+      d3.select('.barChartD3'+num+(0+1)).select('text.'+'label')
+                      .transition()
+                     .duration(duration*num) 
+                     .text(function(){
+                       return current_partial_sum
+                   })
+    }
+    d3.select(".btn").transition()
+                    .delay(duration*(k+1)).attr('disabled', null);
+  }
+  
+  
+}
+ 
+
+function addOnce(){
+  if (iteration < 40){
+    //sum up all graphs in two core into one
+    add_single_core(iteration, sum_arr, single_core_array);
+    updateChart(single_core_array, single_core);
+    if (iteration<=20){
+    //sum up all graphs in four core into one
+      if (iteration == 20){
+            visualizeCompletion(dual_core_array, dual_core)
+        } else {
+        add_dual_core(iteration, sum_arr, dual_core_array);
+        updateChart(dual_core_array, dual_core);
+      }
+      if (iteration<=10){
+        //sum up all graphs in eight core into one
+        if (iteration == 10){
+            visualizeCompletion(quad_core_array, quad_core)
+        } else {
+          add_quad_core(iteration, sum_arr, quad_core_array);
+          updateChart(quad_core_array, quad_core); 
+        }
+        if (iteration<=5){
+          if (iteration == 5){
+            visualizeCompletion(eight_core_array, eight_core)
+          } else {
+            add_eight_core(iteration, sum_arr, eight_core_array);
+            updateChart(eight_core_array, eight_core);
+          }
+        }
+      }
+    }
+  }
+  iteration++;  
+  handleAllRects();
+}
+
+                
+addButton=d3.select('body')
+                .append("button")
+                .text("Add Once")
+                .attr("type","button")
+                .attr("class","btn")
+                .attr("onclick","addOnce()")
+                .style("height",30)
+                .style("width",80)
+
+
+var barTips=d3.select('body')
+              .append("div")
+              .attr("class",'tooltip')
+              .style("display","none")
+              .style('position',"absolute")
+              .style("fill","black")
+
+var chartTips=d3.select('body')
+              .append("div")
+              .attr("class",'tooltip')
+              .style("display","none")
+              .style('position',"absolute")
+              .style("fill","black")
+function handleMouseOver(d,i){
+  //debugger;
+    barTips.style("display","inline")             
+}
+
+function handleMouseMove(d,i){
+    var tipText; 
+    //debugger;
+    parentVal = d3.select(this.parentNode).attr('class')
+    core_num = parentVal[11]
+    classVal = d3.select(this).attr('class')
+    val=Math.round(heightRescale(d3.select(this).attr('height')))
+    if (classVal == "maxBar"){
+       tipText = "Total sum is " + sum
+    }
+    else {
+      if (val == sum){
+        tipText = "Core " + core_num + " has the total sum computed from all cores on this processor: " + val
+      }
+      else tipText = "Core " + core_num + "'s partial sum is " + val
+    }
+    barTips.text(tipText)
+      .style("left", (d3.event.pageX - 34) + "px")
+      .style("top", (d3.event.pageY - 12) + "px")
+      .style("color", "black" )
+    
+}
+function handleMouseOut(d,i){
+     barTips.style("display", "none");
+}
+
+function handleChartMouseOut(d,i){
+     chartTips.style("display", "none");
+}
+
+function handleChartMouseOver(d,i){
+  //debugger;
+    chartTips.style("display","inline")             
+}
+
+function handleChartMouseMove(d,i){
+  chart_class = d3.select(this).attr('class')
+  core_num = chart_class[chart_class.length-1]
+  var proc_description; 
+  var comp_done = 100;
+  var partial_sum = sum_arr.reduce((a, b) => a + b, 0);
+  if (core_num == 1){
+    proc_description = 'Single-core'
+    partial_sum = single_core_array.reduce((a, b) => a + b, 0);
+  }
+  else if (core_num == 2){
+    proc_description = 'Dual-core'
+     partial_sum = dual_core_array.reduce((a, b) => a + b, 0);
+  }
+  else if (core_num == 4){
+    proc_description = 'Quad-core'
+     partial_sum = quad_core_array.reduce((a, b) => a + b, 0);
+  }
+  else if (core_num == 8){
+    proc_description = 'Eight-core'
+     partial_sum = eight_core_array.reduce((a, b) => a + b, 0);
+  }
+  if (Math.round(((iteration*core_num)/sum_arr.length)*100) < 100){
+    comp_done = (Math.round(((iteration*core_num)/sum_arr.length)*100))
+    info = proc_description + " - Iteration : " + (iteration) + ", Work done:\
+   " + comp_done + "%, Current sum: " + partial_sum + " of " + sum    
+  }else {
+    info = proc_description + " - Computation completed after " + ((sum_arr[sum_arr.length-1]/core_num)-1) + " iterations, Current sum: " + partial_sum + " of " + sum    
+ }  
+  chartTips.text(info)
+      .style("left", (d3.event.pageX - 34) + "px")
+      .style("top", (d3.event.pageY - 30) + "px")
+      .style("color","black");
+}
+
+
+
+
+function handleAllRects(){  
+  d3.selectAll('rect'+'.'+'bar')
+      .on("mouseover", handleMouseOver)
+      .on("mouseout",handleMouseOut)
+      .on("mousemove", handleMouseMove)
+  d3.selectAll('rect'+'.'+'maxBar')
+      .on("mouseover", handleMouseOver)
+      .on("mouseout",handleMouseOut)
+      .on("mousemove", handleMouseMove)
+  d3.selectAll('.' + 'svg'+1)
+      .on("mouseover", handleChartMouseOver)
+      .on("mouseout",handleChartMouseOut)
+      .on("mousemove", handleChartMouseMove)
+  d3.selectAll('.' + 'svg'+2)
+      .on("mouseover", handleChartMouseOver)
+      .on("mouseout",handleChartMouseOut)
+      .on("mousemove", handleChartMouseMove)
+  d3.selectAll('.' + 'svg'+4)
+      .on("mouseover", handleChartMouseOver)
+      .on("mouseout",handleChartMouseOut)
+      .on("mousemove", handleChartMouseMove)
+  d3.selectAll('.' + 'svg'+8)
+      .on("mouseover", handleChartMouseOver)
+      .on("mouseout",handleChartMouseOut)
+      .on("mousemove", handleChartMouseMove)
+}
+handleAllRects();
+</script>
+
+
+</body>
+</html>

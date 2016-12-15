@@ -1,0 +1,240 @@
+<html>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="filter.css"> 
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src='https://code.highcharts.com/modules/exporting.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+<script src="plotSupportSource.js"></script>
+<script src="index.js"></script>
+<script src="plotAnyLineTrend.js"></script>
+<script src="plotGovernmentRace.js"></script>
+<script src="plotDegreeAttainment.js"></script>
+<h1> Minority Women in STEM: an exploratory analysis </h1>
+
+<form id='options_form'>
+	<div class="form-group">
+	  <label class="control-label" for="topic">1). Select a Topic</label><br>
+	  <div id="dropdown"> 
+	    <select id="topic" class="form-control">
+	      <option value="" selected hidden>Please select</option>
+	      <option>Doctoral Degree Trend</option>
+	      <option>Master Degree Trend</option>
+	      <option>Doctoral Employment in 2013</option>
+	      <option>Master Employment in 2013</option>
+	      <option>Source of Support for Doctoral in 2013</option>
+	      <option>Government S&E Employment in Races</option>
+	    </select> 
+	   </div>
+	    <br>
+      <br>
+	    <label class="control-label" for="groups">2). Select Data</label><br>
+	   <div id="groups">
+			  <ul class = "main_ul">
+			    <li>
+			      <input type="checkbox" id="optionMale"><label for="optionMale">&nbsp&nbspAll Male</label>
+			      <ul>
+			        <li><label><input id="Men - White" type="checkbox" class="subOptionMale"> White</label></li>
+			        <li><label><input id="Men - Hispanic" type="checkbox" class="subOptionMale"> Hispanic</label></li>
+			        <li><label><input id="Men - African" type="checkbox" class="subOptionMale"> African American</label></li>
+			        <li><label><input id="Men - Native" type="checkbox" class="subOptionMale"> Native American</label></li>
+			        <li><label><input id="Men - Minority" type="checkbox" class="subOptionMale"> STEM Minorites</label></li>
+			      </ul>
+			    </li>
+			  </ul>
+			  <ul class = "main_ul">
+			    <li>
+			      <input type="checkbox" id="optionFemale"><label for="optionFemale">&nbsp&nbspAll Female</label>
+			      <ul>
+			        <li><label><input id="Women - White" type="checkbox" class="subOptionFemale"> White</label></li>
+			        <li><label><input id="Women - Hispanic" type="checkbox" class="subOptionFemale"> Hispanic</label></li>
+			        <li><label><input id="Women - African" type="checkbox" class="subOptionFemale"> African American</label></li>
+			        <li><label><input id="Women - Native" type="checkbox" class="subOptionFemale"> Native American</label></li>
+			        <li><label><input id="Women - Minority" type="checkbox" class="subOptionFemale"> STEM Minorites</label></li>
+			      </ul>
+			    </li>
+			  </ul>
+		</div>
+	  </div>
+	  <div>
+	  <button type="submit" class="btn btn-default">Add Graph</button>
+	</div>
+	</div>
+</form>
+
+</html>
+
+<script>
+
+var chart_counter = 0;
+var test_chart;
+var normalized = false;
+var test_series_calculated = false;
+var new_series_calculated = false;
+var test_series_array = []
+var new_series = []
+
+// updates data
+$('body').on('click', '.update_button',function(){
+  if (normalized == false){
+    if (test_series_calculated == false){
+      for (var i = 0; i < test_chart.series.length; i++) {
+        var y_array = [];
+        for (var j = 0; j < test_chart.series[i].data.length; j++) {
+          y_array.push(test_chart.series[i].data[j].y);
+        }
+        test_series_array.push(y_array);      
+      }
+      test_series_calculated = true;
+    }      
+    if (new_series_calculated == false){
+      new_series = calcPercentChangeByYearOnButtonClick(test_series_array)
+      new_series_calculated = true
+    }
+    for (var i = 0; i < new_series.length; i++) {
+      test_chart.series[i].setData(new_series[i]);      
+    }
+    normalized = true;
+  }
+  else if (normalized == true){
+    for (var i = 0; i < test_series_array.length; i++) {
+      test_chart.series[i].setData(test_series_array[i]);      
+    }
+    normalized = false;
+  }
+  
+      //chart1.series[0].setData([0,1,2,3,4]);*/
+});
+
+// removes chart
+$('body').on('click', '.remove_button_line',function(){
+  $(this).prev().prev('.char').remove();
+  $(this).prev('.update_button').remove();
+  $(this).remove();
+
+});
+
+$('body').on('click', '.remove_button',function(){
+  $(this).prev('.char').remove();
+  $(this).remove();
+
+});
+
+// If male is selected, select all subgroups
+var maleCheckboxes = document.querySelectorAll('input.subOptionMale'),
+    checkallMale = document.getElementById('optionMale');
+
+for(var i=0; i<maleCheckboxes.length; i++) {
+  maleCheckboxes[i].onclick = function() {
+    var maleCheckedCount = document.querySelectorAll('input.subOptionMale:checked').length;
+
+  }
+}
+
+// checkallMale.onclick = function() {
+//   for(var i=0; i<maleCheckboxes.length; i++) {
+//     maleCheckboxes[i].checked = this.checked;
+//   }
+// }
+
+// If female is selected, select all subgroups
+var femaleCheckboxes = document.querySelectorAll('input.subOptionFemale'),
+    checkallFemale = document.getElementById('optionFemale');
+
+for(var i=0; i<femaleCheckboxes.length; i++) {
+  femaleCheckboxes[i].onclick = function() {
+    var femaleCheckedCount = document.querySelectorAll('input.subOptionFemale:checked').length;
+
+  }
+}
+
+// checkallFemale.onclick = function() {
+//   for(var i=0; i<femaleCheckboxes.length; i++) {
+//     femaleCheckboxes[i].checked = this.checked;
+//   }
+// }
+
+$('#topic').on('change', function(e){
+  var topic = $( "#topic option:selected" ).text();
+  if (topic == "Doctoral Employment in 2013" || topic == "Master Employment in 2013") {
+    $("#optionFemale").attr("disabled", true);
+    $("#optionMale").attr("disabled", true);
+  } else {
+    $("#optionFemale").removeAttr("disabled");
+    $("#optionMale").removeAttr("disabled");
+
+  };
+});
+
+
+// Collect options
+ $(function(){
+       $('#options_form').on('submit', function(e){
+       		parameters = [];
+            e.preventDefault();
+            var topic = $( "#topic option:selected" ).text();
+            var groups_selected = [];
+            parameters.push(topic);
+            if (checkallMale.checked) {
+            	groups_selected.push('Men (all)');
+            } 
+          	var maleChecked = document.querySelectorAll('input.subOptionMale:checked')
+          	$(maleChecked).each(function(index, value) { 
+					     groups_selected.push(value.id)
+				   });
+
+           	if (checkallFemale.checked) {
+            	groups_selected.push('Women (all)');
+            } 
+          	var femaleChecked = document.querySelectorAll('input.subOptionFemale:checked')
+          	$(femaleChecked).each(function(index, value) { 
+					     groups_selected.push(value.id)
+				     });
+        	 
+           parameters.push(groups_selected);
+        	 chart_counter += 1;
+           	
+           	var remove_button = $('<input type="button" class="remove_button" id="'+chart_counter+'_remove" value="X"/>');
+           	if (topic == "Doctoral Degree Trend" || topic == "Master Degree Trend" || topic == "Government S&E Employment in Races") {
+           		var container = $('<div class="char" id="line_chart_container_'+chart_counter+'" style="height: 500px, width: 30%"></div>');
+           		$("body").append(container);
+              var remove_button_line = $('<input type="button" class="remove_button_line" id="'+chart_counter+'_remove" value="X"/>');
+              $("#line_chart_container_"+chart_counter).append(remove_button);
+           		parameters.push("line_chart_container_"+chart_counter);
+              var update_button = $('<input type="button" class="update_button" id="update_button" value="+"/>');
+              test_chart = plotGraph(parameters);
+              $(remove_button_line).insertAfter(container);
+              $(update_button).insertAfter(container);
+              
+
+           
+            }
+           	else if (topic == "Doctoral Employment in 2013" || topic == "Master Employment in 2013") {
+           		var container = $('<div class="char" id="bar_chart_container_'+chart_counter+'" style="height: 400px, width: 600px"></div>');
+           		$("body").append(container);
+           		$("#bar_chart_container_"+chart_counter).append(remove_button);
+           		parameters.push("bar_chart_container_"+chart_counter);
+              getValue(parameters[1], parameters[2]);
+              $(remove_button).insertAfter(container);
+           	}
+           	else {
+           		var container = $('<div class="char" id="star_chart_container_'+chart_counter+'" style="height: 500px, min-width: 300px"></div>');
+           		$("body").append(container);
+           		parameters.push("star_chart_container_"+chart_counter);
+              plotSupportSource(parameters[0], parameters[1], parameters[2]);
+              $(remove_button).insertAfter(container);
+           	};
+
+
+       }); 
+    });
+
+
+
+
+
+</script>
